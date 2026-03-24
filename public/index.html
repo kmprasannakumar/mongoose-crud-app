@@ -2,32 +2,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>User API Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mongoose CRUD App</title>
+  <style>
+    body {
+      font-family: Segoe UI, Arial, sans-serif;
+      margin: 2rem;
+      max-width: 800px;
+    }
+
+    form {
+      display: grid;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      max-width: 420px;
+    }
+
+    input, button {
+      padding: 0.6rem;
+      font-size: 1rem;
+    }
+
+    ul {
+      padding-left: 1.2rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>Create User</h1>
-  <button onclick="createUser()">Create Sample User</button>
+  <h1>Mongoose CRUD Users</h1>
+
+  <form id="userForm">
+    <input id="name" placeholder="Name" required>
+    <input id="email" type="email" placeholder="Email" required>
+    <input id="age" type="number" min="0" max="120" placeholder="Age">
+    <button type="submit">Create User</button>
+  </form>
+
+  <button onclick="fetchUsers()">Refresh Users</button>
+  <h2>Users</h2>
+  <ul id="usersList"></ul>
 
   <script>
-    function createUser() {
-      fetch("http://localhost:3000/api/users", {
+    const userForm = document.getElementById("userForm");
+    const usersList = document.getElementById("usersList");
+
+    userForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        age: Number(document.getElementById("age").value)
+      };
+
+      if (Number.isNaN(payload.age)) {
+        delete payload.age;
+      }
+
+      const response = await fetch("/api/users", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          name: "John Doe",
-          email: "john@example.com",
-          age: 25
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log("User Created:", data);
-        alert("User Created! Check console.");
-      })
-      .catch(err => console.error("Error:", err));
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Failed to create user");
+        return;
+      }
+
+      userForm.reset();
+      await fetchUsers();
+    });
+
+    async function fetchUsers() {
+      const response = await fetch("/api/users");
+      const users = await response.json();
+
+      usersList.innerHTML = "";
+      users.forEach((user) => {
+        const item = document.createElement("li");
+        item.textContent = `${user.name} (${user.email})${typeof user.age === "number" ? ` - age ${user.age}` : ""}`;
+        usersList.appendChild(item);
+      });
     }
+
+    fetchUsers();
   </script>
 </body>
 </html>

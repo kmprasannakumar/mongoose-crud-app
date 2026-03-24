@@ -1,20 +1,38 @@
-Run the below commands to install the necessary libraries:
+Mongoose CRUD App
 
-npm init -y
-npm install express mongoose body-parser
+Setup:
+1. Install dependencies:
+	 npm install
+2. Make sure MongoDB is running locally (or set a custom connection string).
 
-To Run the Server:
+Optional environment variables:
+- PORT=3000
+- MONGO_URI=mongodb://localhost:27017/mongoose_crud_app
 
-node server.js
+Run:
+- npm start
 
-Use Postman or curl to test these endpoints:
+Development mode (auto-restart):
+- npm run dev
 
-POST http://localhost:3000/users — Create a user
+Health check:
+- GET http://localhost:3000/api/health
 
-GET http://localhost:3000/users — Get all users
+Browser check:
+- Open http://localhost:3000 to view the Mongoose CRUD Users page.
+- Opening http://localhost:3000/api/health should return:
+	{"status":"ok","database":"connected"}
 
-GET http://localhost:3000/users/:id — Get a specific user
+User endpoints:
+- POST http://localhost:3000/api/users
+- GET http://localhost:3000/api/users
+- GET http://localhost:3000/api/users/:id
+- PUT http://localhost:3000/api/users/:id
+- DELETE http://localhost:3000/api/users/:id
 
-PUT http://localhost:3000/users/:id — Update a user
-
-DELETE http://localhost:3000/users/:id — Delete a user
+Sample request body:
+{
+	"name": "John Doe",
+	"email": "john@example.com",
+	"age": 25
+}

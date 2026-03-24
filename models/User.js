@@ -4,21 +4,31 @@ const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
+        trim: true,
+        minlength: 2
     },
     email: {
         type: String,
         required: true,
-        unique: true
+        unique: true,
+        trim: true,
+        lowercase: true,
+        match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email address']
     },
     age: {
         type: Number,
-        min: 0 // Ensure age cannot be negative
+        min: 0,
+        max: 120
     }
+}, {
+    timestamps: true
 });
 
-// Add pre-save hook for additional validation or formatting, if needed
+// Normalize name formatting before save.
 userSchema.pre('save', function (next) {
-    // You can perform additional validation or modifications before saving the user
+    if (this.name) {
+        this.name = this.name.replace(/\s+/g, ' ').trim();
+    }
     next();
 });
 
